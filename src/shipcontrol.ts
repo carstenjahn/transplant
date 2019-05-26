@@ -1,12 +1,14 @@
-export default class ShipControl {
-    private turn = 0.0;
+import * as THREE from 'three';
+
+class OneDimControl {
+    private speed = 0.0;
     private steering = 0;
     private steeringIntensity = 0;
-    public steeringLeft() {
+    public steeringA() {
         this.steering = -1;
         this.steeringIntensity = this.steeringIntensity < 10 ? 10 : this.steeringIntensity+1;
     }
-    public steeringRight() {
+    public steeringB() {
         this.steering = 1;
         this.steeringIntensity = this.steeringIntensity < 10 ? 10 : this.steeringIntensity+1;
     }
@@ -16,11 +18,48 @@ export default class ShipControl {
     }
 
     public nextFrame() {
-        this.turn += this.steering*this.steeringIntensity*0.01;
-        this.turn *= 0.99;
+        this.speed += this.steering*this.steeringIntensity*0.01;
+        this.speed *= 0.99;
     }
 
-    public getTurn() : number {
-        return this.turn;
+    public getSpeed() : number {
+        return this.speed;
+    }
+}
+
+export class ShipControl {
+    public turn = new OneDimControl();
+    public forward = new OneDimControl();
+    public nextFrame() {
+        this.turn.nextFrame();
+        this.forward.nextFrame();
+    }
+}
+
+export class ShipAndCamera {
+    private ship:THREE.Mesh;
+    private camera:THREE.PerspectiveCamera;
+    constructor() {
+        const geometry = new THREE.ConeGeometry( 0.05, 0.1, 32 );
+        const material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+        this.ship = new THREE.Mesh( geometry, material );
+        this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+        this.camera.position.z = 1;
+    }
+
+    public addToScene(scene:THREE.Scene) {
+        scene.add(this.ship);
+    }
+
+    public getCamera():THREE.PerspectiveCamera {
+        return this.camera;
+    }
+
+    public applyShipControl(shipControl:ShipControl) {
+        this.camera.rotation.z += shipControl.turn.getSpeed() * Math.PI / 180;
+        this.ship.rotation.z += shipControl.turn.getSpeed() * Math.PI / 180;
+        const forward = shipControl.forward.getSpeed() * -0.01;
+        this.ship.translateY(forward);
+        this.camera.translateY(forward);
     }
 }
