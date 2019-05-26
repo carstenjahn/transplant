@@ -24,4 +24,8 @@ export class Asteroids {
         scene.add(this.allAsteroids);
     }
 
+    public getAsteroids():THREE.Object3D[] {
+        return this.allAsteroids.children;
+    }
+
 }

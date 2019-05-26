@@ -62,6 +62,35 @@ export default class Game {
         }
     }
 
+    private collision():boolean {
+        // helpful example: https://blog.webmaestro.fr/collisions-detection-three-js-raycasting/
+
+        // Very simple implementation. Does not take ship's shape into account.
+        // Does not work at high speeds; maybe the vector going in the forward path
+        // should be longer when speed is high.
+
+        const rays = [
+            new THREE.Vector3(0, 0, 1),
+            new THREE.Vector3(1, 0, 1),
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(1, 0, -1),
+            new THREE.Vector3(0, 0, -1),
+            new THREE.Vector3(-1, 0, -1),
+            new THREE.Vector3(-1, 0, 0),
+            new THREE.Vector3(-1, 0, 1)
+        ];
+        const caster = new THREE.Raycaster();
+        const obstacles = this.asteroids.getAsteroids();
+        for (var i = 0; i < rays.length; i += 1) {
+            // We reset the raycaster to this direction
+            caster.set(this.shipAndCamera.getShip().position, rays[i].divideScalar(1.07));
+            // Test if we intersect with any obstacle mesh
+            const collisions = caster.intersectObjects(obstacles);
+            if(collisions.length > 0) {
+                return true;
+            }
+        }
+    }
 
 
     animate() {
@@ -70,6 +99,10 @@ export default class Game {
         this.shipControl.nextFrame();
 
         this.shipAndCamera.applyShipControl(this.shipControl);
+        if(this.collision()) {
+            console.log('coll');
+            this.shipAndCamera.shipCollided();
+        }
 
         this.renderer.render( this.scene, this.camera );
     }

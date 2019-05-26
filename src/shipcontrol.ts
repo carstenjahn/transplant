@@ -41,7 +41,7 @@ export class ShipAndCamera {
     private camera:THREE.PerspectiveCamera;
     constructor() {
         const geometry = new THREE.ConeGeometry( 0.05, 0.1, 32 );
-        const material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+        const material = new THREE.MeshBasicMaterial( {color: 0x0000ff} );
         this.ship = new THREE.Mesh( geometry, material );
         this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
         this.camera.position.z = 1;
@@ -55,11 +55,22 @@ export class ShipAndCamera {
         return this.camera;
     }
 
+    public getShip():THREE.Object3D {
+        return this.ship;
+    }
+
+    public shipCollided() {
+        this.ship.material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+    }
+
+
     public applyShipControl(shipControl:ShipControl) {
         this.camera.rotation.z += shipControl.turn.getSpeed() * Math.PI / 180;
         this.ship.rotation.z += shipControl.turn.getSpeed() * Math.PI / 180;
         const forward = shipControl.forward.getSpeed() * -0.01;
         this.ship.translateY(forward);
         this.camera.translateY(forward);
+
+
     }
 }
