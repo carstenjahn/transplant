@@ -83,7 +83,7 @@ export default class Game {
         const obstacles = this.asteroids.getAsteroids();
         for (var i = 0; i < rays.length; i += 1) {
             // We reset the raycaster to this direction
-            caster.set(this.shipAndCamera.getShip().position, rays[i].divideScalar(1.07));
+            caster.set(this.shipAndCamera.getShip().position, rays[i].divideScalar(1.2));
             // Test if we intersect with any obstacle mesh
             const collisions = caster.intersectObjects(obstacles);
             if(collisions.length > 0) {
