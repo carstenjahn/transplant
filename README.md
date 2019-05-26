@@ -1,4 +1,10 @@
-# Typescript Three.js Webpack Starter
+# Transplant
+
+is an Asteroids-style game.
+
+### Based on a project skeleton
+
+Typescript Three.js Webpack Starter, https://github.com/pinqy520/three-typescript-starter.git
 
 - Typescript support.
 - Webpack
@@ -21,3 +27,5 @@ $ cd three-typescript-starter
 $ npm install # or yarn
 $ npm start
 ```
+
+(preview and live reload works in Safari and Opera, not in Firefox)

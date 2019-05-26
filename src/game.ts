@@ -69,6 +69,8 @@ export default class Game {
         // Does not work at high speeds; maybe the vector going in the forward path
         // should be longer when speed is high.
 
+        // And we can reduce it to less vectors for a 2D world.
+
         const rays = [
             new THREE.Vector3(0, 0, 1),
             new THREE.Vector3(1, 0, 1),
