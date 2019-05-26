@@ -99,7 +99,7 @@ export default class Game {
         requestAnimationFrame( () => this.animate() );
 
         this.shipControl.nextFrame();
-        this.asteroids.nextFrame();
+        this.asteroids.nextFrame(this.shipAndCamera.getCamera().position);
 
         this.shipAndCamera.applyShipControl(this.shipControl);
         if(this.collision()) {
