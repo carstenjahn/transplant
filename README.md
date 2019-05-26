@@ -22,8 +22,8 @@ npm install typescript -g
 ### Start
 
 ```
-$ git clone https://github.com/pinqy520/three-typescript-starter.git
-$ cd three-typescript-starter
+$ git clone https://github.com/carstenjahn/transplant.git
+$ cd transplant
 $ npm install # or yarn
 $ npm start
 ```
