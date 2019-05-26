@@ -65,8 +65,8 @@ export class ShipAndCamera {
 
 
     public applyShipControl(shipControl:ShipControl) {
-        this.camera.rotation.z += shipControl.turn.getSpeed() * Math.PI / 180;
-        this.ship.rotation.z += shipControl.turn.getSpeed() * Math.PI / 180;
+        this.camera.rotation.z -= shipControl.turn.getSpeed() * Math.PI / 180;
+        this.ship.rotation.z -= shipControl.turn.getSpeed() * Math.PI / 180;
         const forward = shipControl.forward.getSpeed() * -0.01;
         this.ship.translateY(forward);
         this.camera.translateY(forward);
