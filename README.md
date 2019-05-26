@@ -2,7 +2,7 @@
 
 is an Asteroids-style game.
 
-### Based on a project skeleton
+## Based on a project skeleton
 
 Typescript Three.js Webpack Starter, https://github.com/pinqy520/three-typescript-starter.git
 
@@ -29,3 +29,8 @@ $ npm start
 ```
 
 (preview and live reload works in Safari and Opera, not in Firefox)
+
+
+## Open Issues, Ideas
+
+* Infinite world: maybe https://stackoverflow.com/questions/8094665/math-calculations-for-infinite-repeating-world-with-rotation
