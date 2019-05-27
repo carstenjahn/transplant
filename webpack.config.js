@@ -1,3 +1,8 @@
+const isProduction = process.env.NODE_ENV === "production";
+const isDevelopment = process.env.NODE_ENV === "development";
+
+console.log('Environment', process.env.NODE_ENV);
+
 /* Configure HTMLWebpack plugin */
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
@@ -23,6 +28,9 @@ const ProgressBarPluginConfig = new ProgressBarPlugin()
 /* Export configuration */
 module.exports = {
     mode: 'development',
+    devServer: {
+        disableHostCheck: isDevelopment
+    },
     devtool: 'source-map',
     entry: [
         './src/index.ts'
