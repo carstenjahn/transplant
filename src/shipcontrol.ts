@@ -6,11 +6,11 @@ class OneDimControl {
     private steeringIntensity = 0;
     public steeringA() {
         this.steering = -1;
-        this.steeringIntensity = this.steeringIntensity < 10 ? 10 : this.steeringIntensity+1;
+        this.steeringIntensity = this.steeringIntensity < 3 ? 3 : this.steeringIntensity+0.1;
     }
     public steeringB() {
         this.steering = 1;
-        this.steeringIntensity = this.steeringIntensity < 10 ? 10 : this.steeringIntensity+1;
+        this.steeringIntensity = this.steeringIntensity < 3 ? 3 : this.steeringIntensity+0.1;
     }
     public noSteer() {
         this.steering = 0;
@@ -20,6 +20,7 @@ class OneDimControl {
     public nextFrame() {
         this.speed += this.steering*this.steeringIntensity*0.01;
         this.speed *= 0.99;
+        this.speed = this.speed > 0 ? Math.min(this.speed, 3) : Math.max(this.speed, -3);
     }
 
     public getSpeed() : number {
