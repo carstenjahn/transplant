@@ -23,8 +23,13 @@ export default class Game {
         this.renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild( this.renderer.domElement );
 
-        window.addEventListener('keydown', (e) => this.handleKeyDown(e), false);
-        window.addEventListener('keyup', (e) => this.handleKeyUp(e), false);
+        window.addEventListener('keydown', (event) => this.handleKeyDown(event), false);
+        window.addEventListener('keyup', (event) => this.handleKeyUp(event), false);
+        window.addEventListener('resize', () => { 
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight); 
+        });
 
         requestAnimationFrame( () => this.animate() );
     }
