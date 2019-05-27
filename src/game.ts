@@ -63,35 +63,25 @@ export default class Game {
     }
 
     private collision():boolean {
-        // helpful example: https://blog.webmaestro.fr/collisions-detection-three-js-raycasting/
-
-        // Very simple implementation. Does not take ship's shape into account.
-        // Does not work at high speeds; maybe the vector going in the forward path
-        // should be longer when speed is high.
-
-        // And we can reduce it to less vectors for a 2D world.
-
-        const rays = [
-            new THREE.Vector3(0, 0, 1),
-            new THREE.Vector3(1, 0, 1),
-            new THREE.Vector3(1, 0, 0),
-            new THREE.Vector3(1, 0, -1),
-            new THREE.Vector3(0, 0, -1),
-            new THREE.Vector3(-1, 0, -1),
-            new THREE.Vector3(-1, 0, 0),
-            new THREE.Vector3(-1, 0, 1)
-        ];
-        const caster = new THREE.Raycaster();
+        // helpful example: https://github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/Collision-Detection.html
+        const shipGeometry = this.shipAndCamera.getShip().geometry as THREE.Geometry;
+        const originPoint = this.shipAndCamera.getShip().position.clone();
         const obstacles = this.asteroids.getAsteroids();
-        for (var i = 0; i < rays.length; i += 1) {
-            // We reset the raycaster to this direction
-            caster.set(this.shipAndCamera.getShip().position, rays[i].divideScalar(1.2));
-            // Test if we intersect with any obstacle mesh
-            const collisions = caster.intersectObjects(obstacles);
-            if(collisions.length > 0) {
+        for (var vertexIndex = 0; vertexIndex <  shipGeometry.vertices.length; vertexIndex++)
+        {
+            const localVertex = shipGeometry.vertices[vertexIndex].clone();
+            const globalVertex = localVertex.applyMatrix4( this.shipAndCamera.getShip().matrix );
+            const directionVector = globalVertex.sub( this.shipAndCamera.getShip().position );
+
+            const ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+            const collisionResults = ray.intersectObjects( obstacles );
+            // it's a collision if the nearest colliding obstacle (collisionResults[0])
+            // is nearer than the ship's vertex that we're testing
+            if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
                 return true;
             }
         }
+        return false;
     }
 
 

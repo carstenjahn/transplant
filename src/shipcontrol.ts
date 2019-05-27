@@ -55,7 +55,7 @@ export class ShipAndCamera {
         return this.camera;
     }
 
-    public getShip():THREE.Object3D {
+    public getShip():THREE.Mesh {
         return this.ship;
     }
 
