@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {ShipControl, ShipAndCamera} from  './shipcontrol';
 import {Asteroids} from  './asteroids';
+import {World} from  './world';
 
 export default class Game {
     private camera;
@@ -62,38 +63,17 @@ export default class Game {
         }
     }
 
-    private collision():boolean {
-        // helpful example: https://github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/Collision-Detection.html
-        const shipGeometry = this.shipAndCamera.getShip().geometry as THREE.Geometry;
-        const originPoint = this.shipAndCamera.getShip().position.clone();
-        const obstacles = this.asteroids.getAsteroids();
-        for (var vertexIndex = 0; vertexIndex <  shipGeometry.vertices.length; vertexIndex++)
-        {
-            const localVertex = shipGeometry.vertices[vertexIndex].clone();
-            const globalVertex = localVertex.applyMatrix4( this.shipAndCamera.getShip().matrix );
-            const directionVector = globalVertex.sub( this.shipAndCamera.getShip().position );
 
-            const ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-            const collisionResults = ray.intersectObjects( obstacles );
-            // it's a collision if the nearest colliding obstacle (collisionResults[0])
-            // is nearer than the ship's vertex that we're testing
-            if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-                return true;
-            }
-        }
-        return false;
-    }
 
 
     animate() {
         requestAnimationFrame( () => this.animate() );
 
         this.shipControl.nextFrame();
-        this.asteroids.nextFrame(this.shipAndCamera.getCamera().position);
+        this.asteroids.nextFrame(this.shipAndCamera.getCamera());
 
         this.shipAndCamera.applyShipControl(this.shipControl);
-        if(this.collision()) {
-            console.log('coll');
+        if(World.collision(this.shipAndCamera.getShip(), this.asteroids.getAsteroids()) !== null) {
             this.shipAndCamera.shipCollided();
         }
 
