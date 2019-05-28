@@ -83,7 +83,13 @@ class Asteroid extends THREE.Mesh {
     private noAsteroidCollision: number;
     private lifetime: number;
 
-    constructor(size = 0.02 + Math.random() * 0.05) {
+    constructor(size = undefined) {
+        if( size === undefined) {
+            size = 0.02 + Math.random() * 0.05;
+            if (Math.random() > 0.95) {
+                size *= 2;
+            }
+        }
         const geometry = new THREE.OctahedronGeometry(size, 0);
         const material = size > Asteroid.VERYSMALL ?
             new THREE.MeshNormalMaterial() :
@@ -100,14 +106,14 @@ class Asteroid extends THREE.Mesh {
     }
 
     public static createSplinter(c1: Asteroid, c2: Asteroid): Asteroid {
-        const a = new Asteroid(avg(c1.size, c2.size) * Math.random() * 0.5);
+        const a = new Asteroid(avg(c1.size, c2.size) * (Math.random() + 1) * 0.3);
         a.speedX = avg(c1.speedX, c2.speedX) + (Math.random() - 0.5) * 0.001;
         a.speedY = avg(c1.speedY, c2.speedY) + (Math.random() - 0.5) * 0.001;
-        const x = avg(c1.position.x, c2.position.x);
-        const y = avg(c1.position.y, c2.position.y);
+        const x = avg(c1.position.x, c2.position.x) + a.size * (Math.random() - 0.5) * 2;
+        const y = avg(c1.position.y, c2.position.y) + a.size * (Math.random() - 0.5) * 2;
         a.position.setX(x + (Math.random() - 0.5) * 0.05);
         a.position.setY(y + (Math.random() - 0.5) * 0.05);
-        a.noAsteroidCollision = 30;
+        a.noAsteroidCollision = 250;
         if(a.size <= Asteroid.VERYSMALL) {
             a.lifetime = Math.round(500+Math.random()*1000);
         }
