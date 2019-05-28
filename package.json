@@ -1,7 +1,7 @@
 {
-  "name": "three-typescript-starter",
+  "name": "transplant",
   "version": "1.0.0",
-  "description": "three.js + typescript",
+  "description": "an Asteroids clone",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pinqy520/three-typescript-starter.git"
+    "url": "git+https://github.com/carstenjahn/transplant.git"
   },
   "keywords": [],
   "author": "Huang Qi",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pinqy520/three-typescript-starter/issues"
+    "url": "https://github.com/carstenjahn/transplant/issues"
   },
-  "homepage": "https://github.com/pinqy520/three-typescript-starter#readme",
+  "homepage": "https://github.com/carstenjahn/transplant#readme",
   "devDependencies": {
     "awesome-typescript-loader": "latest",
     "browser-sync": "latest",
