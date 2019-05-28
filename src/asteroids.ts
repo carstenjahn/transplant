@@ -1,86 +1,142 @@
 import * as THREE from 'three';
-import {World} from  './world';
+import {World} from './world';
 import {Vector3} from "three";
+
+
+function avg(a: number, b: number) {
+    return (a + b) / 2;
+}
 
 export class Asteroids {
 
     private allAsteroids = new THREE.Group();
 
     constructor() {
-        for (var i = 0; i < 300; i++) {
+        for (var i = 0; i < 500; i++) {
             this.allAsteroids.add(new Asteroid());
         }
     }
 
-    public addToScene(scene:THREE.Scene) {
+    public addToScene(scene: THREE.Scene) {
         scene.add(this.allAsteroids);
     }
 
-    public getAsteroids():THREE.Object3D[] {
-        return this.allAsteroids.children;
+    public getAsteroids(): Asteroid[] {
+        return <Asteroid[]> this.allAsteroids.children;
     }
 
-    public nextFrame(camera:THREE.Camera) {
-        this.allAsteroids.children.forEach( (e) => (<Asteroid> e).nextFrame(camera.position));
+    public getCollisionEnabledAsteroids(): Asteroid[] {
+        const largerAsteroids = this.getAsteroids().filter(s => s.getSize() > Asteroid.VERYSMALL);
+        return largerAsteroids;
+    }
 
-        const largerAsteroids = (this.allAsteroids.children as Asteroid[]).filter( s => s.getSize() > 0.03);
+    private static avg(a: number, b: number) {
+        return (a + b) / 2;
+    }
+
+    public nextFrame(camera: THREE.Camera) {
+        {
+            const all = this.allAsteroids.children as Asteroid[];
+            all.forEach((e) => e.nextFrame(camera.position));
+
+            all.forEach((e) => {
+                if (e.isEndOfLife()) {
+                    this.allAsteroids.remove(e);
+                }
+            });
+        }
+
+        const largerAsteroids = this.getCollisionEnabledAsteroids();
         const visibleAsteroids = World.visibleObjects(camera, largerAsteroids);
-        if(visibleAsteroids.length < 100) { // TODO on first render, all of them are visible
-            visibleAsteroids.forEach((a) => {
+        if (visibleAsteroids.length < 100) { // TODO on first render, all of them are visible
+            visibleAsteroids.map(a => a as Asteroid).forEach((a) => {
                 const allButMyself = visibleAsteroids.filter(v => v !== a);
-                const collidingAsteroid = World.collision((a as Asteroid), allButMyself);
-                if (collidingAsteroid !== null) {
+                const collidingAsteroid = <Asteroid>World.collision(a, allButMyself);
+                if (collidingAsteroid !== null && !(collidingAsteroid.isNoAsteroidCollision() && a.isNoAsteroidCollision())) {
                     //console.log('coll', visibleAsteroids.length, allButMyself.length,  a, World.collision(a as THREE.Mesh, allButMyself) );
                     this.allAsteroids.remove(a);
                     this.allAsteroids.remove(collidingAsteroid);
-                    this.addSplinters(a.position);
+                    this.addSplinters(a, collidingAsteroid);
                 }
+
             });
         }
     }
 
 
-    private addSplinters(position:THREE.Vector3) {
-        // should set the splinter direction according to colliding object's directions
-        for (var i = 0; i < 10; i++) {
-            const a = new Asteroid(true);
+    private addSplinters(c1: Asteroid, c2: Asteroid) {
+        const n = Math.round(3+Math.random()*10)
+        for (var i = 0; i < n; i++) {
+            const a = Asteroid.createSplinter(c1, c2);
             this.allAsteroids.add(a);
-            a.position.setX(position.x + (Math.random()-0.5)*0.03);
-            a.position.setY(position.y + (Math.random()-0.5)*0.03);
         }
     }
 
 }
 
 class Asteroid extends THREE.Mesh {
-    private speedX:number;
-    private speedY:number;
-    private size:number;
+    public static VERYSMALL = 0.015;
 
-    constructor(splitter=false) {
-        const size = splitter ? 0.01 : 0.02 + Math.random()*0.05;
-        const geometry = new THREE.OctahedronGeometry( size, 0 );
-        const material = new THREE.MeshNormalMaterial();
-        super( geometry, material );
-        this.position.setX((Math.random() - 0.5)*World.WORLD_WIDTH);
-        this.position.setY((Math.random() - 0.5)*World.WORLD_HEIGTH);
+    private speedX: number;
+    private speedY: number;
+    private size: number;
+    private noAsteroidCollision: number;
+    private lifetime: number;
+
+    constructor(size = 0.02 + Math.random() * 0.05) {
+        const geometry = new THREE.OctahedronGeometry(size, 0);
+        const material = size > Asteroid.VERYSMALL ?
+            new THREE.MeshNormalMaterial() :
+            new THREE.MeshBasicMaterial({color: 0x333333});
+        super(geometry, material);
+        this.position.setX((Math.random() - 0.5) * World.WORLD_WIDTH);
+        this.position.setY((Math.random() - 0.5) * World.WORLD_HEIGTH);
 
         this.size = size;
-        this.speedX = (Math.random()-0.5)*0.003;
-        this.speedY = (Math.random()-0.5)*0.003;
+        this.speedX = (Math.random() - 0.5) * 0.003;
+        this.speedY = (Math.random() - 0.5) * 0.003;
+        this.noAsteroidCollision = 0;
+        this.lifetime = -1;
     }
 
-    public nextFrame(cameraPosition:THREE.Vector3) {
+    public static createSplinter(c1: Asteroid, c2: Asteroid): Asteroid {
+        const a = new Asteroid(avg(c1.size, c2.size) * Math.random() * 0.5);
+        a.speedX = avg(c1.speedX, c2.speedX) + (Math.random() - 0.5) * 0.001;
+        a.speedY = avg(c1.speedY, c2.speedY) + (Math.random() - 0.5) * 0.001;
+        const x = avg(c1.position.x, c2.position.x);
+        const y = avg(c1.position.y, c2.position.y);
+        a.position.setX(x + (Math.random() - 0.5) * 0.05);
+        a.position.setY(y + (Math.random() - 0.5) * 0.05);
+        a.noAsteroidCollision = 30;
+        if(a.size <= Asteroid.VERYSMALL) {
+            a.lifetime = Math.round(500+Math.random()*1000);
+        }
+        return a;
+    }
+
+    public nextFrame(cameraPosition: THREE.Vector3) {
         this.position.setX(this.position.x + this.speedX);
         this.position.setY(this.position.y + this.speedY);
         World.wrapAroundEndOfWorld(this, cameraPosition);
-        this.rotateX(this.speedX*10);
-        this.rotateY(this.speedX*10);
-        this.rotateZ(this.speedX*10);
+        this.rotateX(this.speedX * 10);
+        this.rotateY(this.speedX * 10);
+        this.rotateZ(this.speedX * 10);
+        this.noAsteroidCollision = this.noAsteroidCollision > 0 ? this.noAsteroidCollision - 1 : 0;
+        if(this.lifetime !== -1) {
+            this.lifetime = this.lifetime > 0 ? this.lifetime - 1 : 0;
+        }
     }
 
-    public getSize():number {
+    public getSize(): number {
         return this.size;
+    }
+
+    public isNoAsteroidCollision(): boolean {
+        return this.size <= Asteroid.VERYSMALL || this.noAsteroidCollision > 0;
+    }
+
+    public isEndOfLife(): boolean {
+        return this.lifetime === 0;
     }
 
 }

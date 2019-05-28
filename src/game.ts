@@ -78,7 +78,7 @@ export default class Game {
         this.asteroids.nextFrame(this.shipAndCamera.getCamera());
 
         this.shipAndCamera.applyShipControl(this.shipControl);
-        if(World.collision(this.shipAndCamera.getShip(), this.asteroids.getAsteroids()) !== null) {
+        if(World.collision(this.shipAndCamera.getShip(), this.asteroids.getCollisionEnabledAsteroids()) !== null) {
             this.shipAndCamera.shipCollided();
         }
 
