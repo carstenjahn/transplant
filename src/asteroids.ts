@@ -55,22 +55,25 @@ export class Asteroids {
         }
 
         const largerAsteroids = this.getCollisionEnabledAsteroids();
-        const visibleAsteroids = World.visibleObjects(camera, largerAsteroids);
+        const visibleAsteroids = <Asteroid[]>World.visibleObjects(camera, largerAsteroids);
+        const collisions: [Asteroid, Asteroid][] = []; // list of collision pairs
         if (visibleAsteroids.length < 100) { // TODO on first render, all of them are visible
-            visibleAsteroids.map(a => a as Asteroid).forEach((a) => {
-                const allButMyself = visibleAsteroids.filter(v => v !== a);
-                const collidingAsteroid = <Asteroid>World.collision(a, allButMyself);
-                if (collidingAsteroid !== null && !(collidingAsteroid.isNoAsteroidCollision() && a.isNoAsteroidCollision())) {
-                    //console.log('coll', visibleAsteroids.length, allButMyself.length,  a, World.collision(a as THREE.Mesh, allButMyself) );
-                    this.allAsteroids.remove(a);
-                    this.allAsteroids.remove(collidingAsteroid);
-                    this.addSplinters(a, collidingAsteroid);
+            visibleAsteroids.forEach((a, index) => {
+                if (index < visibleAsteroids.length - 1) { // last one got checked with the second-to-last one
+                    const remainingCrosscheckAsteroids = visibleAsteroids.slice(index + 1);
+                    const collidingAsteroid = <Asteroid>World.collision(a, remainingCrosscheckAsteroids);
+                    if (collidingAsteroid !== null && !(collidingAsteroid.isNoAsteroidCollision() && a.isNoAsteroidCollision())) {
+                        collisions.push([a, collidingAsteroid]);
+                    }
                 }
-
             });
         }
+        collisions.forEach(([c1, c2]) => {
+            this.allAsteroids.remove(c1);
+            this.allAsteroids.remove(c2);
+            this.addSplinters(c1, c2);
+        });
     }
-
 
     private addSplinters(c1: Asteroid, c2: Asteroid) {
         const n = Math.round(randomNum(3, 4));
