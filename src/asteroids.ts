@@ -7,6 +7,14 @@ function avg(a: number, b: number) {
     return (a + b) / 2;
 }
 
+function randomNum(from: number, to: number) {
+    return from + Math.random() * (to - from);
+}
+
+function randomInt(from: number, to: number) {
+    return Math.floor(randomNum(from, to + 1));
+}
+
 export class Asteroids {
 
     private allAsteroids = new THREE.Group();
@@ -22,7 +30,7 @@ export class Asteroids {
     }
 
     public getAsteroids(): Asteroid[] {
-        return <Asteroid[]> this.allAsteroids.children;
+        return <Asteroid[]>this.allAsteroids.children;
     }
 
     public getCollisionEnabledAsteroids(): Asteroid[] {
@@ -65,7 +73,7 @@ export class Asteroids {
 
 
     private addSplinters(c1: Asteroid, c2: Asteroid) {
-        const n = Math.round(3+Math.random()*10)
+        const n = Math.round(randomNum(3, 4));
         for (var i = 0; i < n; i++) {
             const a = Asteroid.createSplinter(c1, c2);
             this.allAsteroids.add(a);
@@ -75,7 +83,7 @@ export class Asteroids {
 }
 
 class Asteroid extends THREE.Mesh {
-    public static VERYSMALL = 0.015;
+    public static VERYSMALL = 0.02;
 
     private speedX: number;
     private speedY: number;
@@ -84,7 +92,7 @@ class Asteroid extends THREE.Mesh {
     private lifetime: number;
 
     constructor(size = undefined) {
-        if( size === undefined) {
+        if (size === undefined) {
             size = 0.02 + Math.random() * 0.05;
             if (Math.random() > 0.95) {
                 size *= 2;
@@ -99,23 +107,23 @@ class Asteroid extends THREE.Mesh {
         this.position.setY((Math.random() - 0.5) * World.WORLD_HEIGTH);
 
         this.size = size;
-        this.speedX = (Math.random() - 0.5) * 0.003;
-        this.speedY = (Math.random() - 0.5) * 0.003;
+        this.speedX = randomNum(-0.0015, 0.0015);
+        this.speedY = randomNum(-0.0015, 0.0015);
         this.noAsteroidCollision = 0;
         this.lifetime = -1;
     }
 
     public static createSplinter(c1: Asteroid, c2: Asteroid): Asteroid {
-        const a = new Asteroid(avg(c1.size, c2.size) * (Math.random() + 1) * 0.3);
-        a.speedX = avg(c1.speedX, c2.speedX) + (Math.random() - 0.5) * 0.001;
-        a.speedY = avg(c1.speedY, c2.speedY) + (Math.random() - 0.5) * 0.001;
-        const x = avg(c1.position.x, c2.position.x) + a.size * (Math.random() - 0.5) * 2;
-        const y = avg(c1.position.y, c2.position.y) + a.size * (Math.random() - 0.5) * 2;
-        a.position.setX(x + (Math.random() - 0.5) * 0.05);
-        a.position.setY(y + (Math.random() - 0.5) * 0.05);
-        a.noAsteroidCollision = 250;
-        if(a.size <= Asteroid.VERYSMALL) {
-            a.lifetime = Math.round(500+Math.random()*1000);
+        const a = new Asteroid(avg(c1.size, c2.size) * randomNum(0.3, 0.8));
+        a.speedX = randomNum(c1.speedX, c2.speedX) * avg(c1.size, c2.size) / a.size * 0.5;
+        a.speedY = randomNum(c1.speedY, c2.speedY) * avg(c1.size, c2.size) / a.size * 0.5;
+        const x = avg(c1.position.x, c2.position.x) + a.size * randomNum(-2, 2);
+        const y = avg(c1.position.y, c2.position.y) + a.size * randomNum(-2, 2);
+        a.position.setX(x);
+        a.position.setY(y);
+        a.noAsteroidCollision = randomInt(100, 250);
+        if (a.size <= Asteroid.VERYSMALL) {
+            a.lifetime = randomInt(500, 1500);
         }
         return a;
     }
@@ -128,7 +136,7 @@ class Asteroid extends THREE.Mesh {
         this.rotateY(this.speedX * 10);
         this.rotateZ(this.speedX * 10);
         this.noAsteroidCollision = this.noAsteroidCollision > 0 ? this.noAsteroidCollision - 1 : 0;
-        if(this.lifetime !== -1) {
+        if (this.lifetime !== -1) {
             this.lifetime = this.lifetime > 0 ? this.lifetime - 1 : 0;
         }
     }

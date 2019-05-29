@@ -80,6 +80,7 @@ export default class Game {
         if(!this.paused)
             requestAnimationFrame( () => this.animate() );
 
+        //console.time('game');
         this.shipControl.nextFrame();
         this.asteroids.nextFrame(this.shipAndCamera.getCamera());
 
@@ -87,6 +88,7 @@ export default class Game {
         if(World.collision(this.shipAndCamera.getShip(), this.asteroids.getCollisionEnabledAsteroids()) !== null) {
             this.shipAndCamera.shipCollided();
         }
+        //console.timeEnd('game'); - around 10ms currently
 
         this.renderer.render( this.scene, this.camera );
     }
