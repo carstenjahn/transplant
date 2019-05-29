@@ -10,6 +10,7 @@ export default class Game {
     private shipControl = new ShipControl();
     private shipAndCamera = new ShipAndCamera();
     private asteroids = new Asteroids();
+    private paused = false;
 
     constructor() {
         //console.log('the answer to life, the universe, and everything is: ', config.answerToLifeTheUniverseAndEverything);
@@ -65,6 +66,10 @@ export default class Game {
             case 'ArrowDown':
                 this.shipControl.forward.noSteer();
                 break;
+            case 'p':
+                this.paused = !this.paused;
+                if(!this.paused)
+                    requestAnimationFrame( () => this.animate() );
         }
     }
 
@@ -72,7 +77,8 @@ export default class Game {
 
 
     animate() {
-        requestAnimationFrame( () => this.animate() );
+        if(!this.paused)
+            requestAnimationFrame( () => this.animate() );
 
         this.shipControl.nextFrame();
         this.asteroids.nextFrame(this.shipAndCamera.getCamera());
