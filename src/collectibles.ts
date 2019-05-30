@@ -1,20 +1,23 @@
 import * as THREE from 'three';
 import {World} from './world';
 import {randomNum} from './util';
+import {ScoreLives} from "./score";
 
 export class Collectibles {
     private all: Collectible[] = [];
     private scene;
+    private scoreLives;
 
-    constructor() {
+    constructor(scene: THREE.Scene, scoreLives: ScoreLives) {
+        this.scene = scene;
+        this.scoreLives = scoreLives;
         for (var i = 0; i < 50; i++) {
             this.all.push(new Collectible());
         }
     }
 
-    public addToScene(scene: THREE.Scene) {
-        scene.add(...this.all);
-        this.scene = scene;
+    public addToScene() {
+        this.scene.add(...this.all);
     }
 
     public nextFrame(camera: THREE.Camera) {
@@ -43,7 +46,7 @@ export class Collectibles {
         if (collectedMe !== null) {
             this.scene.remove(collectedMe);
             this.all = this.all.filter((e) => e !== collectedMe);
-            // and increase the score...
+            this.scoreLives.addScore(1);
         }
     }
 }
