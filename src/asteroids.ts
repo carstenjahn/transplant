@@ -1,19 +1,6 @@
 import * as THREE from 'three';
 import {World} from './world';
-import {Vector3} from "three";
-
-
-function avg(a: number, b: number) {
-    return (a + b) / 2;
-}
-
-function randomNum(from: number, to: number) {
-    return from + Math.random() * (to - from);
-}
-
-function randomInt(from: number, to: number) {
-    return Math.floor(randomNum(from, to + 1));
-}
+import {randomNum, randomInt, avg} from './util';
 
 export class Asteroids {
 
@@ -33,13 +20,10 @@ export class Asteroids {
         return <Asteroid[]>this.allAsteroids.children;
     }
 
-    public getCollisionEnabledAsteroids(): Asteroid[] {
+    public getCollisionEnabledAsteroids(camera: THREE.Camera): Asteroid[] {
         const largerAsteroids = this.getAsteroids().filter(s => s.getSize() > Asteroid.VERYSMALL);
-        return largerAsteroids;
-    }
-
-    private static avg(a: number, b: number) {
-        return (a + b) / 2;
+        const visibleAsteroids = <Asteroid[]>World.visibleObjects(camera, largerAsteroids);
+        return visibleAsteroids;
     }
 
     public nextFrame(camera: THREE.Camera) {
@@ -54,8 +38,7 @@ export class Asteroids {
             });
         }
 
-        const largerAsteroids = this.getCollisionEnabledAsteroids();
-        const visibleAsteroids = <Asteroid[]>World.visibleObjects(camera, largerAsteroids);
+        const visibleAsteroids = this.getCollisionEnabledAsteroids(camera);
         const collisions: [Asteroid, Asteroid][] = []; // list of collision pairs
         if (visibleAsteroids.length < 100) { // TODO on first render, all of them are visible
             visibleAsteroids.forEach((a, index) => {
@@ -101,11 +84,16 @@ class Asteroid extends THREE.Mesh {
                 size *= 2;
             }
         }
-        const geometry = new THREE.OctahedronGeometry(size, 0);
-        const material = size > Asteroid.VERYSMALL ?
-            new THREE.MeshNormalMaterial() :
-            new THREE.MeshBasicMaterial({color: 0x333333});
-        super(geometry, material);
+        if(size > Asteroid.VERYSMALL) {
+            const geometry = new THREE.IcosahedronGeometry(size, 0);
+            const material = new THREE.MeshNormalMaterial();
+            super(geometry, material);
+        } else {
+            const geometry = new THREE.TetrahedronGeometry(size, 0);
+            const material = new THREE.MeshBasicMaterial({color: 0x333333});
+            super(geometry, material);
+            this.position.setZ(-0.3);
+        }
         this.position.setX((Math.random() - 0.5) * World.WORLD_WIDTH);
         this.position.setY((Math.random() - 0.5) * World.WORLD_HEIGTH);
 
@@ -124,7 +112,7 @@ class Asteroid extends THREE.Mesh {
         const y = avg(c1.position.y, c2.position.y) + a.size * randomNum(-2, 2);
         a.position.setX(x);
         a.position.setY(y);
-        a.noAsteroidCollision = randomInt(100, 250);
+        a.noAsteroidCollision = randomInt(200, 250);
         if (a.size <= Asteroid.VERYSMALL) {
             a.lifetime = randomInt(500, 1500);
         }
@@ -134,11 +122,13 @@ class Asteroid extends THREE.Mesh {
     public nextFrame(cameraPosition: THREE.Vector3) {
         this.position.setX(this.position.x + this.speedX);
         this.position.setY(this.position.y + this.speedY);
-        World.wrapAroundEndOfWorld(this, cameraPosition);
-        this.rotateX(this.speedX * 10);
-        this.rotateY(this.speedX * 10);
-        this.rotateZ(this.speedX * 10);
-        this.noAsteroidCollision = this.noAsteroidCollision > 0 ? this.noAsteroidCollision - 1 : 0;
+        if(this.size > Asteroid.VERYSMALL) {
+            World.wrapAroundEndOfWorld(this, cameraPosition);
+            this.rotateX(this.speedX * 10);
+            this.rotateY(this.speedX * 10);
+            this.rotateZ(this.speedX * 10);
+            this.noAsteroidCollision = this.noAsteroidCollision > 0 ? this.noAsteroidCollision - 1 : 0;
+        }
         if (this.lifetime !== -1) {
             this.lifetime = this.lifetime > 0 ? this.lifetime - 1 : 0;
         }

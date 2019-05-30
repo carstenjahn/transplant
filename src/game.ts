@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {ShipControl, ShipAndCamera} from  './shipcontrol';
 import {Asteroids} from  './asteroids';
 import {World} from  './world';
+import {Collectibles} from "./collectibles";
 
 export default class Game {
     private camera;
@@ -10,6 +11,7 @@ export default class Game {
     private shipControl = new ShipControl();
     private shipAndCamera = new ShipAndCamera();
     private asteroids = new Asteroids();
+    private collectibles = new Collectibles();
     private paused = false;
 
     constructor() {
@@ -18,6 +20,7 @@ export default class Game {
         this.scene = new THREE.Scene();
         this.shipAndCamera.addToScene(this.scene);
         this.asteroids.addToScene(this.scene);
+        this.collectibles.addToScene(this.scene);
         this.camera = this.shipAndCamera.getCamera();
 
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -82,12 +85,15 @@ export default class Game {
 
         //console.time('game');
         this.shipControl.nextFrame();
-        this.asteroids.nextFrame(this.shipAndCamera.getCamera());
+        this.asteroids.nextFrame(this.camera);
+        this.collectibles.nextFrame(this.camera);
+        this.collectibles.destroyCollectiblesOnObstacleCollision(this.camera, this.asteroids.getCollisionEnabledAsteroids(this.camera));
 
         this.shipAndCamera.applyShipControl(this.shipControl);
-        if(World.collision(this.shipAndCamera.getShip(), this.asteroids.getCollisionEnabledAsteroids()) !== null) {
+        if(World.collision(this.shipAndCamera.getShip(), this.asteroids.getCollisionEnabledAsteroids(this.camera)) !== null) {
             this.shipAndCamera.shipCollided();
         }
+        this.collectibles.bonusForCollection(this.camera, this.shipAndCamera.getShip());
         //console.timeEnd('game'); - around 10ms currently
 
         this.renderer.render( this.scene, this.camera );
