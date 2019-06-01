@@ -9,13 +9,14 @@ export class World {
     // multiplayer games in the same world impossible, but it's easier
     // for now (compared to the torus implementation).
     public static wrapAroundEndOfWorld(wrapMe:THREE.Object3D, cameraPosition:THREE.Vector3) {
+        
         if(wrapMe.position.x > cameraPosition.x + this.WORLD_WIDTH/2) {
-            wrapMe.position.setX(wrapMe.position.x + (-1 * this.WORLD_WIDTH));
+            wrapMe.position.setX(wrapMe.position.x - this.WORLD_WIDTH);
         } else if(wrapMe.position.x < cameraPosition.x - this.WORLD_WIDTH/2) {
             wrapMe.position.setX(wrapMe.position.x + this.WORLD_WIDTH);
         }
         if(wrapMe.position.y > cameraPosition.y + this.WORLD_HEIGTH/2) {
-            wrapMe.position.setY(wrapMe.position.y + (-1 * this.WORLD_HEIGTH));
+            wrapMe.position.setY(wrapMe.position.y - this.WORLD_HEIGTH);
         } else if(wrapMe.position.y < cameraPosition.y - this.WORLD_HEIGTH/2) {
             wrapMe.position.setY(wrapMe.position.y + this.WORLD_HEIGTH);
         }
