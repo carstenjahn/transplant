@@ -55,18 +55,26 @@ export default class Game {
     }
     
     private initLight() {
-        const ambientLight = new THREE.AmbientLight( 0x222222 );
-        this.scene.add( ambientLight );
+        /*const ambientLight = new THREE.AmbientLight( 0x222222 );
+        this.scene.add( ambientLight );*/
 
-        const directionalLight = new THREE.DirectionalLight( 0xffffcc, 1 );
+        const directionalLight = new THREE.DirectionalLight( 0xffffcc, 3 );
         directionalLight.position.set(0, 0, 0);
-        directionalLight.target = this.shipAndCamera.getShip();
+        directionalLight.target = new THREE.Object3D;
+        directionalLight.target.position.set(1, 1, 0);
         this.scene.add( directionalLight );
+
+        const directionalLight2 = new THREE.DirectionalLight( 0x2233ff, 1 );
+        directionalLight.position.set(1, 1, 0);
+        directionalLight2.target = directionalLight;
+        this.scene.add( directionalLight2 );
     }
 
     private initStats() {
         this.stats = new Stats();
-        this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+        // this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+        this.stats.dom.removeAttribute('style');
+        this.stats.dom.className = "stats";
         document.body.appendChild(this.stats.dom);
     }
 
@@ -101,14 +109,13 @@ export default class Game {
                 break;
             case 'p':
                 this.paused = !this.paused;
+                document.body.classList.toggle('paused');
                 if (!this.paused) requestAnimationFrame(this.animate.bind(this));
         }
     }
 
     animate() {
         this.stats.begin();
-
-        if (!this.paused) requestAnimationFrame(this.animate.bind(this));
 
         //console.time('game');
         this.shipControl.nextFrame();
@@ -127,6 +134,6 @@ export default class Game {
 
         this.stats.end();
 
-        requestAnimationFrame(this.animate.bind(this));
+        if (!this.paused) requestAnimationFrame(this.animate.bind(this));
     }
 }
