@@ -37,11 +37,33 @@ export default class Game {
         document.body.appendChild(this.scoreLives.livesElement);
         document.body.appendChild(this.scoreLives.scoreElement);
 
+        this.addStars();
+
         this.initEvents();
         this.initLight();
         this.initStats();
 
         requestAnimationFrame(this.animate.bind(this));
+    }
+
+    // todo: make it infinite, repeating or wrapping
+    private addStars() {
+        const starsGeometry = new THREE.Geometry();
+
+        for (let stars = 0; stars < 10000; stars++ ) {
+            const star = new THREE.Vector3();
+
+            star.x = THREE.Math.randFloatSpread(World.WORLD_WIDTH * 10);
+            star.y = THREE.Math.randFloatSpread(World.WORLD_WIDTH * 10);
+            star.z = THREE.Math.randFloat(-12, -3);
+        
+            starsGeometry.vertices.push(star);
+        }
+        
+        const starsMaterial = new THREE.PointsMaterial({ color: 0x8888AA, size: 0.025 });
+        const starField = new THREE.Points(starsGeometry, starsMaterial);
+
+        this.scene.add(starField);
     }
 
     private initEvents() {
