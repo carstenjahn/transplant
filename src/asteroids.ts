@@ -2,12 +2,16 @@ import * as THREE from 'three';
 import {World} from './world';
 import {randomNum, randomInt, avg} from './util';
 
+const textureLoader = new THREE.TextureLoader();
+const texture = textureLoader.load( '/src/textures/3215.jpg' );
+const bumpTexture = textureLoader.load( '/src/textures/3215-bump.jpg' );
+
 export class Asteroids {
 
     private allAsteroids = new THREE.Group();
 
     constructor() {
-        for (var i = 0; i < 500; i++) {
+        for (var i = 0; i < 25; i++) {
             this.allAsteroids.add(new Asteroid());
         }
     }
@@ -85,8 +89,18 @@ class Asteroid extends THREE.Mesh {
             }
         }
         if(size > Asteroid.VERYSMALL) {
-            const geometry = new THREE.IcosahedronGeometry(size, 0);
-            const material = new THREE.MeshNormalMaterial();
+            // const geometry = new THREE.IcosahedronGeometry(size, 0);
+            // const material = new THREE.MeshNormalMaterial();
+            const geometry = new THREE.SphereGeometry( size, 8, 8);
+            const material = new THREE.MeshPhongMaterial({
+                color: 0xCCCCCC,
+                map: texture,
+                bumpMap: bumpTexture,
+                bumpScale: 0.02,
+                displacementMap: bumpTexture,
+                displacementScale: size / 2,
+                shininess: 10,
+            });
             super(geometry, material);
         } else {
             const geometry = new THREE.TetrahedronGeometry(size, 0);
