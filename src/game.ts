@@ -64,7 +64,7 @@ export default class Game {
         directionalLight.target.position.set(1, 1, 0);
         this.scene.add( directionalLight );
 
-        const directionalLight2 = new THREE.DirectionalLight( 0x2233ff, 1 );
+        const directionalLight2 = new THREE.DirectionalLight( 0x2255ff, 1.5 );
         directionalLight.position.set(1, 1, 0);
         directionalLight2.target = directionalLight;
         this.scene.add( directionalLight2 );
