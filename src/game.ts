@@ -19,9 +19,6 @@ export default class Game {
     private stats;
 
     constructor() {
-        //console.log('the answer to life, the universe, and everything is: ', config.answerToLifeTheUniverseAndEverything);
-
-        this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color( 0x000009 );
 
         this.shipAndCamera.addToScene(this.scene);
@@ -139,7 +136,6 @@ export default class Game {
     animate() {
         this.stats.begin();
 
-        //console.time('game');
         this.shipControl.nextFrame();
         this.asteroids.nextFrame(this.camera);
         this.collectibles.nextFrame(this.camera);
@@ -150,7 +146,6 @@ export default class Game {
             this.shipAndCamera.shipCollided();
         }
         this.collectibles.bonusForCollection(this.camera, this.shipAndCamera.getShip());
-        //console.timeEnd('game'); - around 10ms currently
 
         this.renderer.render(this.scene, this.camera);
 
