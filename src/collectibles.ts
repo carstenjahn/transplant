@@ -7,11 +7,12 @@ export class Collectibles {
     private all: Collectible[] = [];
     private scene;
     private scoreLives;
+    private static INITIAL_AMOUNT = 50;
 
     constructor(scene: THREE.Scene, scoreLives: ScoreLives) {
         this.scene = scene;
         this.scoreLives = scoreLives;
-        for (var i = 0; i < 50; i++) {
+        for (var i = 0; i < Collectibles.INITIAL_AMOUNT; i++) {
             this.all.push(new Collectible());
         }
     }
@@ -26,7 +27,7 @@ export class Collectibles {
 
     public getVisibleCollectibles(camera: THREE.Camera): Collectible[] {
         const v = <Collectible[]>World.visibleObjects(camera, this.all);
-        if (v.length == 50)
+        if (v.length == Collectibles.INITIAL_AMOUNT)
             return [];
         return v;
     }

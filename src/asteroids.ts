@@ -7,11 +7,12 @@ const texture = textureLoader.load( '/src/textures/3215.jpg' );
 const bumpTexture = textureLoader.load( '/src/textures/3215-bump.jpg' );
 
 export class Asteroids {
+    private static INITIAL_AMOUNT = 25;
 
     private allAsteroids = new THREE.Group();
 
     constructor() {
-        for (var i = 0; i < 25; i++) {
+        for (var i = 0; i < Asteroids.INITIAL_AMOUNT; i++) {
             this.allAsteroids.add(new Asteroid());
         }
     }
@@ -44,7 +45,7 @@ export class Asteroids {
 
         const visibleAsteroids = this.getCollisionEnabledAsteroids(camera);
         const collisions: [Asteroid, Asteroid][] = []; // list of collision pairs
-        if (visibleAsteroids.length < 100) { // TODO on first render, all of them are visible
+        if (visibleAsteroids.length < Asteroids.INITIAL_AMOUNT) { // TODO on first render, all of them are visible
             visibleAsteroids.forEach((a, index) => {
                 if (index < visibleAsteroids.length - 1) { // last one got checked with the second-to-last one
                     const remainingCrosscheckAsteroids = visibleAsteroids.slice(index + 1);
